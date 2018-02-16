@@ -1,0 +1,15 @@
+[Unit]
+    Description=Mining service
+    After=network.target
+
+    [Service]
+    Environment=GPU_FORCE_64BIT_PTR=0
+    Environment=GPU_MAX_HEAP_SIZE=100
+    Environment=GPU_USE_SYNC_OBJECTS=1
+    Environment=GPU_MAX_ALLOC_PERCENT=100
+    Environment=GPU_SINGLE_ALLOC_PERCENT=100
+
+    ExecStart=/bin/bash -ce "exec /crypto/tools/mine -l >> /var/log/mining.log 2>&1"
+
+    [Install]
+    WantedBy=multi-user.target

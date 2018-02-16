@@ -1,0 +1,2 @@
+find . -maxdepth 1 -type d \( ! -name . \) -exec bash -c "if [ -d '{}/.git' ]; then  cd '{}' && echo 'checking {}' && git pull | grep -v Already ; fi" \;
+

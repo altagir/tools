@@ -1,0 +1,14 @@
+#!/bin/bash
+
+source /etc/mining.conf
+
+if [ "$1" != "" ]; then
+	echo "$1	$(curl -s "https://min-api.cryptocompare.com/data/price?fsym=$1&tsyms=USD"  | jq -r .USD)"
+	exit 0
+fi
+
+for i in $COINS_PRICES; do
+	echo "$i	$(curl -s "https://min-api.cryptocompare.com/data/price?fsym=$i&tsyms=USD"  | jq -r .USD)"
+done
+
+

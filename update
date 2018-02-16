@@ -1,0 +1,20 @@
+#!/bin/bash
+
+echo "*** updating ***"
+cd ~ && updateRec
+cd /crypto && updateRec
+
+
+
+echo ""
+echo "*** checking status ***"
+
+echo "tools:"
+cd /crypto/tools && git status -s
+
+if [ -d "~/env" ]; then
+	echo "env:"
+	cd ~/env && git status -s
+fi
+
+

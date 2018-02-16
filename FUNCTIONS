@@ -1,0 +1,57 @@
+#!/bin/bash
+
+source /etc/mining.conf
+
+################################################################################
+
+settings_load () {
+    if [ ! -f "$MINER_PATH/.mineDefaultCoin" ]; then
+#        echo "creating settings file for mine.sh"
+
+        settings_save
+    else
+#        echo "loading settings file for mine.sh"
+        DEFAULT_COIN=$(grep DEFAULT_COIN $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
+        RESTART_IF_IDLE=$(grep RESTART_IF_IDLE= $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
+    fi
+}
+
+settings_save () {
+    rm -f "$MINER_PATH/.mineDefaultCoin"
+    echo "DEFAULT_COIN=$DEFAULT_COIN" >> "$MINER_PATH/.mineDefaultCoin"
+    echo "RESTART_IF_IDLE=$RESTART_IF_IDLE" >> "$MINER_PATH/.mineDefaultCoin"
+}
+
+
+################################################################################
+
+line='                   '
+display_coins () {
+	echo "Coins available :"
+
+	for ((i=0; i<$MINERS_COUNT; i++))
+ 	do
+		if [ $i -lt 10 ]; then
+			printf " "
+		fi
+
+		COINNAME=${!MINERS[i]:0:1}
+		DESCRIPTION="${!MINERS[i]:1:1}"
+		MINER_PROTO="${!MINERS[i]:3:1}"
+		
+		printf "${BOLD}%s${NC}\t%s%s" $i 
+		printf '%-20s' $COINNAME
+		#printf '%-30s' "${BOLD}%s${NC}\t%s%s" $i $COINNAME "${line:${#COINNAME}}"
+
+		printf '%-30s' "$DESCRIPTION"
+		printf '%-20s' "$MINER_PROTO"
+
+		echo ""
+
+#${lineD:${#DESCRIPTION}}" 
+#		echo "dd"
+	done
+   
+	printf "\nFor which coin ? [${BOLD}$DEFAULT_COIN${NC}] : "
+}
+

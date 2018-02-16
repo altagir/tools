@@ -1,0 +1,52 @@
+#!/bin/bash
+
+################################################################################
+### SCRIPT_DIR is the location the script
+SCRIPT_DIR="`dirname \"$0\"`"                 # relative
+SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
+if [ -z "$SCRIPT_DIR" ] ; then
+    # error; for some reason, the path is not accessible
+    # to the script (e.g. permissions re-evaled after suid)
+    exit 1  # fail
+fi
+
+################################################################################
+
+
+source $SCRIPT_DIR/FUNCTIONS
+
+settings_load
+if [ "$RESTART_IF_IDLE" = "0" ]; then
+	exit 0
+fi
+
+
+FAIL_COUNT=0
+
+for GPU in {0..6}
+do
+	UTIL=`nvidia-smi -i $GPU --query-gpu=utilization.gpu --format=csv,noheader | cut -f1 -d" "`
+	if (($UTIL < $IDLE_GPU)); then
+		FAIL_COUNT=$(($FAIL_COUNT + 1))
+		GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
+		echo "GPU$GPU IDLE $GPUINFO"
+	else
+		echo "GPU$GPU OK"
+	fi
+done
+
+# if 2 fail. restart
+echo $FAIL_COUNT
+if [ $FAIL_COUNT -gt 1 ]; then
+
+	state=$($SCRIPT_DIR/ms)
+	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE restarting miner" <<< $state
+
+	### restart ccminer
+	echo "restarting mining"
+	systemctl restart mining
+
+	exit 1
+fi
+
+exit 0

@@ -1,0 +1,6 @@
+#!/bin/bash
+source /etc/mining.conf
+source $TOOLS_PATH/FUNCTIONS
+settings_load
+echo "mining $DEFAULT_COIN"
+echo ""

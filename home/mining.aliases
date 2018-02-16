@@ -1,0 +1,26 @@
+export DISPLAY=:0
+
+
+export CRYPTO_TOOLS='/crypto/tools'
+
+export PATH="$PATH:$CRYPTO_TOOLS"
+
+alias ccc='cd /crypto'
+
+alias zem='vi ~/env/mining'
+alias vm='vi $CYRPTOPATH/bin/mine'
+alias vc='vi $CRYPTO_TOOLS/bin/CONFIG'
+
+alias sm='nvidia-smi'
+
+alias mw='watch ''nvidia-smi -q | grep -E "Utilization|  Graphics|Power Draw"'''
+alias hushgui='cd ~/crypto/hush/src && ../../hush-swing-wallet-ui/build/jars/HUSHSwingWalletUI.jar'
+
+alias pl8='sudo nvidia-smi -i 1,2,3,4,5,6 -pl '
+alias pl7='sudo nvidia-smi -i 0 -pl '
+
+alias tm='tail -n 1000 /var/log/mining.log'
+
+alias perf='nvidia-smi -q -d PERFORMANCE'
+
+

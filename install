@@ -1,0 +1,106 @@
+#!/bin/bash
+
+##############################################################################################
+
+sudo mkdir -p /crypto/miners
+sudo chown -R $USER:$USER /crypto
+
+sudo touch /var/log/mining.log
+sudo chown syslog:adm /var/log/mining.log
+
+##############################################################################################
+echo "installing packages"
+
+sudo apt-get install ssh zsh tree screen vim net-tools bmon ifupdown checksecurity logcheck at-spi2-core \
+    build-essential gcc-5 g++-5 cmake pkg-config libtool automake autoconf autogen \
+    jq curl git mailutils xterm busybox ntpdate \
+    nvidia-cuda-dev nvidia-cuda-toolkit xorg xserver-xorg-legacy xserver-xorg-video-dummy libcurl4-openssl-dev libssl-dev libjansson-dev autotools-dev uthash-dev libevent-dev libncurses5-dev libncursesw5-dev > /dev/null
+    
+
+##############################################################################################
+
+echo "intalling miners"
+
+
+if [ ! -f "/crypto/miners/0.3.4b/miner" ]; then
+	mkdir -p /crypto/miners/0.3.4b
+	cd /crypto/miners/0.3.4b
+	wget https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.Linux.Bin.tar.gz > /dev/null
+	tar zxvf Zec.miner.0.3.4b.Linux.Bin.tar.gz > /dev/null
+	rm Zec.miner.0.3.4b.Linux.Bin.tar.gz
+	cd /crypto/miners
+fi
+
+
+if [ ! -d "/crypto/miners/ccminer" ]; then
+	echo "ccminer"
+	git clone https://github.com/tpruvot/ccminer.git
+else
+	echo "updating ccminer"
+	cd /crypto/miners/ccminer && git pull
+
+fi
+
+if [ ! -f "/crypto/miners/ccminer/ccminer" ]; then
+	echo "compiling ccminer, be patient"
+	cd /crypto/miners/ccminer && ./build.sh &> /dev/null
+fi
+
+if [ ! -d "/crypto/miners/zm_0.6" ]; then
+	echo "DSTM ZCash"
+	cd /crypto/miners/
+	tar zxvf /crypto/tools/miners/zm_0.6.tar.gz > /dev/null
+fi
+
+
+#apt-get install bfgminer
+
+
+if [ ! -f "/etc/X11/xorg.conf" ]; then
+	sudo nvidia-xconfig --allow-empty-initial-configuration --enable-all-gpus --cool-bits=31 --separate-x-screens
+fi
+
+
+
+# config
+BASH_MODIF=$(grep mining.aliases ~/.bashrc | wc -l)
+if [ "$BASH_MODIF" = "0" ]; then
+	echo "modifying ~/.bashrc"
+	echo "source /crypto/tools/home/mining.aliases" >> ~/.bashrc
+	source ~/.bashrc
+fi
+
+CRONTAB_MODIF=$(grep mcheck-service /etc/crontab | wc -l)
+if [ "$CRONTAB_MODIF" = "0" ]; then
+	echo "modifying /etc/crontab"
+	echo "*/2 *   * * *   root    /crypto/tools/mcheck-service >/dev/null 2>&" | sudo tee --append /etc/crontab > /dev/null
+fi
+
+
+if [ ! -f "/etc/mining.conf" ]; then
+	sudo cp /crypto/tools/etc/mining.conf /etc/mining.conf
+fi
+
+if [ ! -f "/etc/logrotate.d/mining" ]; then
+	sudo cp /crypto/tools/etc/logrotate.d/mining /etc/logrotate.d/mining
+fi
+
+
+if [ ! -f "/etc/systemd/system/mining.service" ]; then
+	echo "Placing mining daemon"
+	sudo cp /crypto/tools/etc/systemd/system/mining.service /etc/systemd/system/mining.service
+	sudo systemctl enable mining
+fi
+
+
+if [ ! -f "/etc/update-motd.d/99-mining" ]; then
+	echo "Placing mining motd"
+	sudo cp /crypto/tools/etc/update-motd.d/99-mining /etc/update-motd.d/99-mining
+fi
+
+
+# grub
+
+# edit config !
+
+

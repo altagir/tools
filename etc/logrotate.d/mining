@@ -1,0 +1,9 @@
+/var/log/mining.log {
+  rotate 7
+  weekly
+  compress
+  missingok
+  notifempty
+  copytruncate
+}
+
