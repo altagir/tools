@@ -14,6 +14,20 @@ Feel free to use it, learn from it, adapt it and share your learning
 ***
 ## Usage
 
+These are the binaries present in ```/crypto/tools```, which you will call most
+
+* mine
+⋅⋅⋅main script to mine manually, use -h for help
+⋅⋅⋅remembers last config used, called from mining.service or used manually (multiple mining)
+* mc
+⋅⋅⋅ mine change : prompt a list of coins to switch mining to. (this only applies to daemon, if you are mining manually, do not use as it will respawn the daemon)
+* ms
+⋅⋅⋅ mine status : detailled status of mining
+* mu
+⋅⋅⋅ mine uptime : shows uptime of current miner (daemon)
+
+
+
 
 ***
 ## Installation (from a fresh lubuntu 17.10 installation)
@@ -96,4 +110,4 @@ Please send me feedback and change request
 
 
 
-DSTM miner 0.6 is provided (source : https://bitcointalk.org/index.php?topic=2021765.0)
+[DSTM miner 0.6](https://bitcointalk.org/index.php?topic=2021765.0) is provided in this repo
