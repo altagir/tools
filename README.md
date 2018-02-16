@@ -2,13 +2,13 @@
 
 This is my collection of tools to control a NVIDIA rig
 
-Feel free to use it, learn from it, adapt it and share your addition
+Feel free to use it, learn from it, adapt it and share your learning
 
 **OS** : lubuntu 17.10
 
 **Motherboard** : ASRock H110 Pro BTC**+
 
-****GPUS** : 6x 1080 and 1x 1070 ti
+**GPUS** : 6x 1080 and 1x 1070 ti
 
 
 ***
@@ -38,6 +38,24 @@ Next, this script will install required apt packages, place some config files, i
 ```
 cd /crypto/tools && ./install
 ```
+
+in details, the install script does :
+* Create directories, log files and permissions
+* Install apt packages required for tools, compiling miners and essentials
+* Download and install Zcash EWFB miner 0.3.4b (binary)
+* clone git of ccminer and Compile (LONG)
+* install DSTM Zcash miner 0.6
+* setup xorg.conf if not present (nvidia-xconfig --allow-empty-initial-configuration --enable-all-gpus --cool-bits=31 --separate-x-screens) . This step is IMPORTANT
+* modify .bashrc to source some aliases in ```/crypto/tools/home/mining.aliases```
+* modify /etc/crontab to add rule to periodically launch ```/crypto/tools/mcheck-service```
+* install ```/etc/mining.conf```
+* install a logrotate rule  ```/etc/logrotate.d/mining```
+* install the daemon ```/etc/systemd/system/mining.service```
+* install a motd (shows what is currently mining at login) ```/etc/update-motd.d/99-mining```
+
+
+
+
 
 ### Additional Steps:
 
