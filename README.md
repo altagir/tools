@@ -10,6 +10,8 @@ Feel free to use it, learn from it, adapt it and share your learning
 
 **GPUS** : 6x 1080 and 1x 1070 ti
 
+**Perf** : 1080 : **570** Sol/s,     1070ti : **530** Sol/s
+
 
 ***
 ## Usage
