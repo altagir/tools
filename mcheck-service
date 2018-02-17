@@ -39,7 +39,7 @@ done
 echo $FAIL_COUNT
 if [ $FAIL_COUNT -gt 1 ]; then
 
-	state=$($SCRIPT_DIR/ms)
+	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.conf)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE restarting miner" <<< $state
 
 	### restart ccminer

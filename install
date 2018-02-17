@@ -14,7 +14,7 @@ echo "installing packages"
 sudo apt-get install ssh zsh tree screen vim net-tools bmon ifupdown checksecurity logcheck at-spi2-core \
     build-essential gcc-5 g++-5 cmake pkg-config libtool automake autoconf autogen \
     jq curl git mailutils xterm busybox ntpdate \
-    nvidia-cuda-dev nvidia-cuda-toolkit xorg xserver-xorg-legacy xserver-xorg-video-dummy libcurl4-openssl-dev libssl-dev libjansson-dev autotools-dev uthash-dev libevent-dev libncurses5-dev libncursesw5-dev > /dev/null
+    nvidia-cuda-dev nvidia-cuda-toolkit xorg xserver-xorg-legacy xserver-xorg-video-dummy libcurl4-openssl-dev libssl-dev libjansson-dev autotools-dev uthash-dev libevent-dev libncurses5-dev libncursesw5-dev libbase58-dev libblkmaker-0.1-dev libhidapi-dev libusb-1.0-0-dev libmicrohttpd-dev  libudev-dev libcurl4-openssl-dev libscrypt-dev yasm > /dev/null
     
 
 ##############################################################################################
@@ -23,6 +23,7 @@ echo "intalling miners"
 
 
 if [ ! -f "/crypto/miners/0.3.4b/miner" ]; then
+	echo "installing ewfb miner"
 	mkdir -p /crypto/miners/0.3.4b
 	cd /crypto/miners/0.3.4b
 	wget https://github.com/nanopool/ewbf-miner/releases/download/v0.3.4b/Zec.miner.0.3.4b.Linux.Bin.tar.gz > /dev/null
@@ -33,18 +34,86 @@ fi
 
 
 if [ ! -d "/crypto/miners/ccminer" ]; then
-	echo "ccminer"
+	echo "cloning ccminer"
 	git clone https://github.com/tpruvot/ccminer.git
 else
 	echo "updating ccminer"
 	cd /crypto/miners/ccminer && git pull
-
 fi
 
 if [ ! -f "/crypto/miners/ccminer/ccminer" ]; then
 	echo "compiling ccminer, be patient"
 	cd /crypto/miners/ccminer && ./build.sh &> /dev/null
 fi
+
+
+
+
+if [ ! -d "/crypto/miners/bfgminer" ]; then
+	echo "cloning bfgminer"
+	cd /crypto/miners/
+	git clone https://github.com/luke-jr/bfgminer.git
+else
+	echo "updating bfgminer"
+	cd /crypto/miners/bfgminer && git pull
+fi
+
+if [ ! -f "/crypto/miners/bfgminer/bfgminer" ]; then
+	cd /crypto/miners/bfgminer 
+	echo "configuring bfgminer"
+	./autogen.sh
+	./configure --enable-scrypt  --enable-cpumining
+	echo "compiling bfgminer, be patient"
+	make &> /dev/null
+fi
+
+
+
+# nsgminer 
+
+if [ ! -d "/crypto/miners/nsgminer" ]; then
+	echo "cloning nsgminer"
+	cd /crypto/miners/
+	git clone https://github.com/ghostlander/nsgminer.git
+else
+	echo "updating nsgminer"
+	cd /crypto/miners/nsgminer && git pull
+fi
+
+if [ ! -f "/crypto/miners/nsgminer/nsgminer" ]; then
+	echo "configuring nsgminer"
+	cd /crypto/miners/nsgminer
+	./autogen.sh &> /dev/null
+	./configure  --enable-scrypt  --enable-cpumining --enable-bitforce --enable-icarus &> /dev/null &> /dev/null
+	echo "compiling nsgminer, be patient"
+	make &> /dev/null
+fi
+
+
+
+# sgminer
+
+if [ ! -d "/crypto/miners/sgminer-x17" ]; then
+	echo "sgminer-x17"
+	cd /crypto/miners/
+	git clone https://github.com/LordzS/sgminer-x17.git
+else
+	echo "updating sgminer-x17"
+	cd /crypto/miners/sgminer-x17 && git pull
+fi
+
+if [ ! -f "/crypto/miners/sgminer-x17/sgminer" ]; then
+	echo "configuring sgminer-x17"
+	cd /crypto/miners/sgminer-x17
+	sh ./autogen.sh &> /dev/null
+	./configure &> /dev/null
+	echo "compiling sgminer-x17, be patient"
+	make &> /dev/null
+fi
+
+
+
+
 
 if [ ! -d "/crypto/miners/zm_0.6" ]; then
 	echo "DSTM ZCash"
@@ -57,6 +126,7 @@ fi
 
 
 if [ ! -f "/etc/X11/xorg.conf" ]; then
+	echo "configuring X"
 	sudo nvidia-xconfig --allow-empty-initial-configuration --enable-all-gpus --cool-bits=31 --separate-x-screens
 fi
 

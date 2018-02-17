@@ -37,7 +37,7 @@ if [ "$XORG_NBINSTANCES" = "0" ] || [ "$XORG_NBINSTANCES" = "1" ]; then
     echo "mining: Starting X servers"
     X :0 &
     # increase for slow HD
-    sleep 1
+    sleep 2
     export DISPLAY=:0
 fi
 
@@ -157,7 +157,7 @@ do
         continue
     fi
   
-    printf "Mining ${BOLD}$COIN${NB} with $DEVICES_COUNT devices ($DEVICES) on $HOSTNAME"
+    printf "Mining ${BOLD}$COIN${NB} with $DEVICES_COUNT devices ($DEVICES) on $HOSTNAME\n"
     mail $EMAIL_NOTIF -s "$HOSTNAME : Mining $COIN ($DEVICES_COUNT GPUS)" <<< "Started mining $COIN with devices $DEVICES"
     
     MINER_DESC="${!MINERS[i]:1:1}"

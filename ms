@@ -19,6 +19,13 @@ cd $MINER_PATH
 
 settings_load
 
+if [ "$1" = "-nofancy" ]; then
+	BOLD=""
+	BLUE=""
+	RED=""
+	NB=""
+	NC=""
+fi
 
 CURRENTLY_MINING=$DEFAULT_COIN
 
