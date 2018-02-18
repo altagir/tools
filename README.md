@@ -6,9 +6,11 @@ Feel free to use it, learn from it, adapt it and share your learning
 
 **OS** : lubuntu 17.10
 
-**Motherboard** : ASRock H110 Pro BTC**+
+**Motherboard** : ASRock H110 Pro BTC+
 
 **GPUS** : 6x 1080 and 1x 1070 ti
+
+**Perf** : 1080 : **570** Sol/s,     1070ti : **530** Sol/s
 
 
 ***
@@ -17,17 +19,40 @@ Feel free to use it, learn from it, adapt it and share your learning
 These are the binaries present in ```/crypto/tools```, which you will call most
 
 * mine
-⋅⋅⋅main script to mine manually, use -h for help
-⋅⋅⋅remembers last config used, called from mining.service or used manually (multiple mining)
+  * main script to mine manually, use -h for help
+  * remembers last config used, called from mining.service or used manually (multiple mining)
 * mc
-⋅⋅⋅ mine change : prompt a list of coins to switch mining to. (this only applies to daemon, if you are mining manually, do not use as it will respawn the daemon)
+  * mine change : prompt a list of coins to switch mining to. (this only applies to daemon, if you are mining manually, do not use as it will respawn the daemon)
 * ms
-⋅⋅⋅ mine status : detailled status of mining
+  * mine status : detailled status of mining
 * mu
-⋅⋅⋅ mine uptime : shows uptime of current miner (daemon)
+  * mine uptime : shows uptime of current miner (daemon)
+  
+* enable_autoreload
+  * enable_autoreload 0|1
+  * enable or disable periodic checking of mining (crontab calling mcheck-service)
+  * you may want to disable this when mining manually or testing
+
+* overclock
+  * PLEASE CUSTOMIZE !! it will not run on your system due to a check of hostname
+
+* install
+  * Automate installation for a fresh lubuntu / debian install
+* mcheck-service
+  * if 2 GPUs use less than IDLE_GPU (in /etc/mining.conf), restart daemon. Called from crontab
+* update
+  * helper script to update git repos
+* updateRec
+  * update all subfolders in current directory containing git
 
 
-
+* prices
+  * fetch current prices for space separated COINS_PRICES defined in CONFIG  
+* prices
+  * same as prices, but without the names (useful for copypasting in a spreadsheet)
+  
+* symbolic links to installed / compiled miners : bfgminer, ccminer, ewfb, zm
+  
 
 ***
 ## Installation (from a fresh lubuntu 17.10 installation)
