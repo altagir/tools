@@ -189,18 +189,14 @@ do
 
     elif [ "$MINER_TOUSE" = "BFGMINER" ]; then
 
-	echo "TODO"
+	echo "$BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES" 
+	/bin/bash -ce "exec $BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
 	exit 1
     
     else
         echo "Unconfigured miner $MINER"
         exit 1
     fi
-
-
-#	/bin/bash -ce "exec $EQUIHASH_MINER --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --dev $DEVICES_SPACES"
- #$EQUIHASH_MINER --server "$MINER_SERVER" --port "$MINER_PORT" --user "$MINER_USER.$HOSTNAME" --pass "$MINER_PASS" --dev "$DEVICES_SPACES"
-#        /bin/bash -ce "exec $CRYPTONIGHT_MINER --url stratum+tcp://$SERVER:$PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --dev $DEVICES_SPACES"
    
     exit 0 
 done
