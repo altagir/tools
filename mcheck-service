@@ -45,8 +45,5 @@ if [ $FAIL_COUNT -gt 1 ]; then
 	### restart ccminer
 	echo "restarting mining"
 	systemctl restart mining
-
-	exit 1
 fi
 
-exit 0
