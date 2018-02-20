@@ -19,7 +19,7 @@ source /etc/mining.conf
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
-	echo "no mining detected"
+	printf "${BOLD}NO mining detected !!${NB}\n"
 else
-	printf "Mining ${BOLD}$DEFAULT_COIN${NB} uptime: ${BOLD}$(ps -o etime= -p $PID) ${NB}\n"
+	printf "Mining ${BOLD}$DEFAULT_COIN${NB}\tsince${BOLD}$(ps -o etime= -p $PID) ${NB}\n"
 fi

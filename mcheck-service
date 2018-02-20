@@ -64,7 +64,7 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 		UNKNOWN_STATE=$(grep Unknown $GPUINFO | wc -l)
 		ERR_STATE=$(grep ERR $GPUINFO | wc -l)
 
-		if [ ! "$UNKNOWN_STATE" = "0" ] || [ ! "$ERR_STATE" = "0" ; then
+		if [ ! "$UNKNOWN_STATE" = "0" ] || [ ! "$ERR_STATE" = "0" ] ; then
 			echo "Rebooting $GPUINFO"
 			reboot
 			exit 0
