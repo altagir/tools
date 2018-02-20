@@ -33,7 +33,7 @@ PID=$(ps -ef | awk '/[m]iner/{print $2}')
 UPTIME=$(echo $(ps -o etime= -p $PID) | xargs)
 
 
-printf "Nb GPUS          : $NB_GPUS\n"
+printf "Nb GPUS          : ${BOLD}$NB_GPUS${NB}\n"
 printf "Currently mining : ${BOLD}$CURRENTLY_MINING${NB}\n"
 printf "Mining uptime    : ${BOLD}$UPTIME${NB}\n\n"
 
@@ -56,7 +56,7 @@ for GPU in $(seq 0 $((NB_GPUS-1))); do
   if (($UTIL < $IDLE_GPU)); then
     printf "$GPU\t${RED}IDLE${NC}"
   else
-    printf "$GPU\t${BLUE}OK${NC}"
+    printf "$GPU\t${BOLD}OK${NC}"
   fi
 
   printf "\t$UTIL%%\t$TEMP C\t$POWER /$POWER_SET\t$FAN%%\t$NAME\n"

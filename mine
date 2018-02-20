@@ -167,7 +167,8 @@ do
     MINER_PORT="${!MINERS[i]:5:1}"
     MINER_USER="${!MINERS[i]:6:1}"
     MINER_PASS="${!MINERS[i]:7:1}"
-    
+  
+  
 
     if [ "$MINER_TOUSE" = "ZM" ]; then
 

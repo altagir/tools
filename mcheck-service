@@ -1,5 +1,17 @@
 #!/bin/bash
 
+LOCKFILE=/tmp/mining.lock
+if [ -e ${LOCKFILE} ] && kill -0 `cat ${LOCKFILE}`; then
+    echo "already running"
+    exit
+fi
+
+# make sure the lockfile is removed when we exit and then claim it
+trap "rm -f ${LOCKFILE}; exit" INT TERM EXIT
+echo $$ > ${LOCKFILE}
+
+
+
 ################################################################################
 ### SCRIPT_DIR is the location the script
 SCRIPT_DIR="`dirname \"$0\"`"                 # relative
@@ -21,29 +33,61 @@ if [ "$RESTART_IF_IDLE" = "0" ]; then
 fi
 
 
+PID=$(ps -ef | awk '/[m]iner/{print $2}')
+if [ "$PID" = "" ]; then
+        echo "no mining detected"
+	systemctl restart mining
+	exit 0
+else
+	UP=$(ps -o etime= -p $PID)
+	UP="$(echo -e "${UP}" | sed -e 's/^[[:space:]]*//')"	
+	DIFF=`expr substr ${UP} 1 5`
+	if [ "$DIFF" = "00:00" ]; then
+		echo "already checked"
+		exit 0
+	fi
+        echo "Mining uptime: $UP"
+fi
+
+
 FAIL_COUNT=0
 
-for GPU in {0..6}
-do
+
+GPU=0
+while [ "$GPU" -lt "$NB_GPUS" ]; do
 	UTIL=`nvidia-smi -i $GPU --query-gpu=utilization.gpu --format=csv,noheader | cut -f1 -d" "`
 	if (($UTIL < $IDLE_GPU)); then
 		FAIL_COUNT=$(($FAIL_COUNT + 1))
 		GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
 		echo "GPU$GPU IDLE $GPUINFO"
+
+		UNKNOWN_STATE=$(grep Unknown $GPUINFO | wc -l)
+		ERR_STATE=$(grep ERR $GPUINFO | wc -l)
+
+		if [ ! "$UNKNOWN_STATE" = "0" ] || [ ! "$ERR_STATE" = "0" ; then
+			echo "Rebooting $GPUINFO"
+			reboot
+			exit 0
+		fi
 	else
 		echo "GPU$GPU OK"
 	fi
+
+	let GPU=GPU+1 
+
 done
 
 # if 2 fail. restart
-echo $FAIL_COUNT
 if [ $FAIL_COUNT -gt 1 ]; then
 
-	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.conf)
+	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.conf)$(nvidia-smi)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE restarting miner" <<< $state
 
 	### restart ccminer
 	echo "restarting mining"
 	systemctl restart mining
 fi
+
+rm -f ${LOCKFILE}
+
 
