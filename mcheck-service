@@ -35,18 +35,18 @@ fi
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
-        echo "no mining detected"
+        echo "no mining detectedi, restarting system"
 	systemctl restart mining
 	exit 0
 else
 	UP=$(ps -o etime= -p $PID)
 	UP="$(echo -e "${UP}" | sed -e 's/^[[:space:]]*//')"	
 	DIFF=`expr substr ${UP} 1 5`
-	if [ "$DIFF" = "00:00" ]; then
-		echo "already checked"
+	if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
+		echo "miner started less than 2 mn ago, skipping check"
 		exit 0
 	fi
-        echo "Mining uptime: $UP"
+        #echo "Mining uptime: $UP"
 fi
 
 
@@ -55,22 +55,25 @@ FAIL_COUNT=0
 
 GPU=0
 while [ "$GPU" -lt "$NB_GPUS" ]; do
-	UTIL=`nvidia-smi -i $GPU --query-gpu=utilization.gpu --format=csv,noheader | cut -f1 -d" "`
+
+	GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
+
+	if [[ $GPUINFO = *"Unknown"* ]]; then
+		echo "Rebooting due to unknown GPU state $GPUINFO"
+		reboot
+       		exit 0
+	elif [[ $GPUINFO = *"ERR"* ]]; then
+		echo "Rebooting due to ERROR in GPU state $GPUINFO"
+		reboot
+       		exit 0
+	fi
+
+	UTIL=$(echo $GPUINFO | cut -f3 -d"," | cut -f2 -d" ")
 	if (($UTIL < $IDLE_GPU)); then
-		FAIL_COUNT=$(($FAIL_COUNT + 1))
-		GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
+		let FAIL_COUNT=FAIL_COUNT+1 
 		echo "GPU$GPU IDLE $GPUINFO"
-
-		UNKNOWN_STATE=$(grep Unknown $GPUINFO | wc -l)
-		ERR_STATE=$(grep ERR $GPUINFO | wc -l)
-
-		if [ ! "$UNKNOWN_STATE" = "0" ] || [ ! "$ERR_STATE" = "0" ] ; then
-			echo "Rebooting $GPUINFO"
-			reboot
-			exit 0
-		fi
-	else
-		echo "GPU$GPU OK"
+	#else
+	#	echo "GPU$GPU OK"
 	fi
 
 	let GPU=GPU+1 
@@ -78,9 +81,9 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 done
 
 # if 2 fail. restart
-if [ $FAIL_COUNT -gt 1 ]; then
+if [ $FAIL_COUNT -ge 2 ]; then
 
-	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.conf)$(nvidia-smi)
+	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.log)$(nvidia-smi)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE restarting miner" <<< $state
 
 	### restart ccminer

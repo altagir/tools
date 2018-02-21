@@ -1,0 +1,2 @@
+mine -c HUSH_S -d 3,4,5,6 >> /var/log/mining.log &
+mine -c XVG_LYRAZ -d 0,1,2 -i 28 >> /var/log/mining.log &
