@@ -5,9 +5,9 @@
 SCRIPT_DIR="`dirname \"$0\"`"                 # relative
 SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
 if [ -z "$SCRIPT_DIR" ] ; then
-    # error; for some reason, the path is not accessible
-    # to the script (e.g. permissions re-evaled after suid)
-    exit 1  # fail
+	# error; for some reason, the path is not accessible
+	# to the script (e.g. permissions re-evaled after suid)
+	exit 1  # fail
 fi
 
 source $SCRIPT_DIR/FUNCTIONS

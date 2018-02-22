@@ -5,9 +5,9 @@
 SCRIPT_DIR="`dirname \"$0\"`"                 # relative
 SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
 if [ -z "$SCRIPT_DIR" ] ; then
-    # error; for some reason, the path is not accessible
-    # to the script (e.g. permissions re-evaled after suid)
-    exit 1  # fail
+	# error; for some reason, the path is not accessible
+	# to the script (e.g. permissions re-evaled after suid)
+	exit 1  # fail
 fi
 
 source $SCRIPT_DIR/FUNCTIONS
@@ -42,25 +42,23 @@ printf "#\tStatut\tUsage\tTemp\t Power / Power limit\tFan\t Name\n"
 echo "---------------------------------------------------------------------------------------"
 
 for GPU in $(seq 0 $((NB_GPUS-1))); do
-  GPUINFO=`nvidia-smi -i $GPU --query-gpu=utilization.gpu,temperature.gpu,power.draw,power.limit,fan.speed,name --format=csv,noheader`
-  UTIL=`nvidia-smi -i $GPU --query-gpu=utilization.gpu --format=csv,noheader | cut -f1 -d" "`  
+	GPUINFO=`nvidia-smi -i $GPU --query-gpu=utilization.gpu,temperature.gpu,power.draw,power.limit,fan.speed,name --format=csv,noheader`
+	UTIL=`nvidia-smi -i $GPU --query-gpu=utilization.gpu --format=csv,noheader | cut -f1 -d" "`  
 
-  UTIL=$(echo $GPUINFO | cut -f1 -d " ")
-  TEMP=$(echo $GPUINFO | cut -f2 -d ",")
-  POWER=$(echo $GPUINFO | cut -f3 -d "," | cut -f2 -d " ")
-  POWER_SET=$(echo $GPUINFO | cut -f4 -d ",")
-  FAN=$(echo $GPUINFO | cut -f8 -d " ")
-  NAME=$(echo $GPUINFO | cut -f6 -d ",")
+	UTIL=$(echo $GPUINFO | cut -f1 -d " ")
+	TEMP=$(echo $GPUINFO | cut -f2 -d ",")
+	POWER=$(echo $GPUINFO | cut -f3 -d "," | cut -f2 -d " ")
+	POWER_SET=$(echo $GPUINFO | cut -f4 -d ",")
+	FAN=$(echo $GPUINFO | cut -f8 -d " ")
+	NAME=$(echo $GPUINFO | cut -f6 -d ",")
 
 
-  if (($UTIL < $IDLE_GPU)); then
-    printf "$GPU\t${RED}IDLE${NC}"
-  else
-    printf "$GPU\t${BOLD}OK${NC}"
-  fi
+	if (($UTIL < $IDLE_GPU)); then
+		printf "$GPU\t${RED}IDLE${NC}"
+	else
+		printf "$GPU\t${BOLD}OK${NC}"
+	fi
 
-  printf "\t$UTIL%%\t$TEMP C\t$POWER /$POWER_SET\t$FAN%%\t$NAME\n"
-
+	printf "\t$UTIL%%\t$TEMP C\t$POWER /$POWER_SET\t$FAN%%\t$NAME\n"
 
 done
-

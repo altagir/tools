@@ -1,3 +1,10 @@
+#!/bin/bash
 
-
-
+# no instance yet, start X server on each card
+if [ "$XORG_NBINSTANCES" = "0" ] || [ "$XORG_NBINSTANCES" = "1" ]; then
+	echo "mining: Starting X servers"
+	X :0 &
+	# increase for slow HD
+	sleep 2
+	export DISPLAY=:0
+fi

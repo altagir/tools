@@ -2,8 +2,8 @@
 
 LOCKFILE=/tmp/mining.lock
 if [ -e ${LOCKFILE} ] && kill -0 `cat ${LOCKFILE}`; then
-    echo "already running"
-    exit
+	echo "already running"
+	exit
 fi
 
 # make sure the lockfile is removed when we exit and then claim it
@@ -17,9 +17,9 @@ echo $$ > ${LOCKFILE}
 SCRIPT_DIR="`dirname \"$0\"`"                 # relative
 SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
 if [ -z "$SCRIPT_DIR" ] ; then
-    # error; for some reason, the path is not accessible
-    # to the script (e.g. permissions re-evaled after suid)
-    exit 1  # fail
+	# error; for some reason, the path is not accessible
+	# to the script (e.g. permissions re-evaled after suid)
+	exit 1  # fail
 fi
 
 ################################################################################
@@ -35,7 +35,7 @@ fi
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
-        echo "no mining detectedi, restarting system"
+	echo "no mining detectedi, restarting system"
 	systemctl restart mining
 	exit 0
 else
@@ -46,14 +46,13 @@ else
 		echo "miner started less than 2 mn ago, skipping check"
 		exit 0
 	fi
-        #echo "Mining uptime: $UP"
+	#echo "Mining uptime: $UP"
 fi
 
 
 FAIL_COUNT=0
-
-
 GPU=0
+
 while [ "$GPU" -lt "$NB_GPUS" ]; do
 
 	GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
@@ -65,7 +64,7 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 	elif [[ $GPUINFO = *"ERR"* ]]; then
 		echo "Rebooting due to ERROR in GPU state $GPUINFO"
 		reboot
-       		exit 0
+		exit 0
 	fi
 
 	UTIL=$(echo $GPUINFO | cut -f3 -d"," | cut -f2 -d" ")
