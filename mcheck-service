@@ -42,7 +42,7 @@ else
 	UP=$(ps -o etime= -p $PID)
 	UP="$(echo -e "${UP}" | sed -e 's/^[[:space:]]*//')"	
 	DIFF=`expr substr ${UP} 1 5`
-	if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
+	if [[ "$DIFF" = "00:00"* ]] || [[ "$DIFF" = "00:01"* ]]; then
 		echo "miner started less than 2 mn ago, skipping check"
 		exit 0
 	fi
@@ -83,11 +83,11 @@ done
 # if 2 fail. restart
 if [ $FAIL_COUNT -ge 2 ]; then
 
-	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 50 /var/log/mining.log)$(nvidia-smi)
-	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE restarting miner" <<< $state
+	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 20 /var/log/mining.log 2> /dev/null)$(nvidia-smi)
+	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE ($FAIL_COUNT/$NB_GPUS), restarting miner" <<< $state
 
 	### restart ccminer
-	echo "restarting mining"
+	echo "restarting mining, fail=$FAIL_COUNT"
 	systemctl restart mining
 fi
 

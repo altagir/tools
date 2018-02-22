@@ -199,6 +199,9 @@ do
         exit 1
     fi
    
+    echo "Miner interrupted. restarting"
+    sudo service mining restart
+
     exit 0 
 done
 
