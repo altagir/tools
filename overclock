@@ -1,5 +1,29 @@
 #!/bin/bash
 
+
+# this is for 1070ti and 1080
+
+FANSPEED_1070=85
+FANSPEED_1080=75
+
+POWLIM_1070=170
+POWLIM_1080=180
+
+CLOCKOFFSET_1070=120
+CLOCKOFFSET_1080=125
+#CLOCKOFFSET_1070=100
+#CLOCKOFFSET_1080=100
+
+
+#MEMOFFSET_1070=1000
+#MEMOFFSET_1080=1000
+MEMOFFSET_1070=1375
+MEMOFFSET_1080=1450
+
+VOLTOFFSET_1080=16000
+
+################################################################################################
+
 echo "overclocking..."
 
 # you must run this (done through install) for overclocking to run, separate screens is optional
@@ -26,59 +50,86 @@ if [ "$HOSTNAME" != "barbara" ]; then
 fi
 
 
+
+
+################################################################################
+
+usage()
+{
+cat << EOF
+usage: $0 options
+
+This script builds and mines the various targets
+
+OPTIONS:
+   -m      just memory
+   -c      just core
+   -v      Verbose
+EOF
+}
+
+JUST_CORE=0
+JUST_MEM=0
+
+
+while getopts “hmc” OPTION
+do
+case $OPTION in
+	h)
+		usage
+		exit 0
+		;;
+	c)
+		JUST_CORE=1
+		;;
+
+	m)
+		JUST_MEM=1
+		;;
+
+	?)
+		usage
+		exit 0
+		;;
+esac
+done
+ 
+
+
 # sudo nvidia-smi -pm ENABLED
 
-# this is for 1070ti and 1080
-
-FANSPEED_1070=85
-FANSPEED_1080=75
-
-POWLIM_1070=170
-POWLIM_1080=180
-
-CLOCKOFFSET_1070=125
-CLOCKOFFSET_1080=125
-#CLOCKOFFSET_1070=100
-#CLOCKOFFSET_1080=100
-
-
-#MEMOFFSET_1070=1000
-#MEMOFFSET_1080=1000
-MEMOFFSET_1070=1380
-MEMOFFSET_1080=1450
-
-VOLTOFFSET_1080=16000
 
 #########################################################
 # FANS ##################################################   
 
 
+if [ ! "$JUST_CORE" = "1" ] && [ ! "$JUST_MEM" = "1" ]; then
+	nvidia-settings -V \
+		-a "[gpu:0]/GPUFanControlState=1" \
+		-a "[gpu:1]/GPUFanControlState=1" \
+		-a "[gpu:2]/GPUFanControlState=1" \
+		-a "[gpu:3]/GPUFanControlState=1" \
+		-a "[gpu:4]/GPUFanControlState=1" \
+		-a "[gpu:5]/GPUFanControlState=1" \
+		-a "[gpu:6]/GPUFanControlState=1"
 
-nvidia-settings -V \
-	-a "[gpu:0]/GPUFanControlState=1" \
-	-a "[gpu:1]/GPUFanControlState=1" \
-	-a "[gpu:2]/GPUFanControlState=1" \
-	-a "[gpu:3]/GPUFanControlState=1" \
-	-a "[gpu:4]/GPUFanControlState=1" \
-	-a "[gpu:5]/GPUFanControlState=1" \
-	-a "[gpu:6]/GPUFanControlState=1"
-
-nvidia-settings -V \
-	-a "[fan:0]/GPUTargetFanSpeed=$FANSPEED_1070" \
-	-a "[fan:1]/GPUTargetFanSpeed=$FANSPEED_1080" \
-	-a "[fan:2]/GPUTargetFanSpeed=$FANSPEED_1080" \
-	-a "[fan:3]/GPUTargetFanSpeed=$FANSPEED_1080" \
-	-a "[fan:4]/GPUTargetFanSpeed=$FANSPEED_1080" \
-	-a "[fan:5]/GPUTargetFanSpeed=$FANSPEED_1080" \
-	-a "[fan:6]/GPUTargetFanSpeed=$FANSPEED_1080"
-
+	nvidia-settings -V \
+		-a "[fan:0]/GPUTargetFanSpeed=$FANSPEED_1070" \
+		-a "[fan:1]/GPUTargetFanSpeed=$FANSPEED_1080" \
+		-a "[fan:2]/GPUTargetFanSpeed=$FANSPEED_1080" \
+		-a "[fan:3]/GPUTargetFanSpeed=$FANSPEED_1080" \
+		-a "[fan:4]/GPUTargetFanSpeed=$FANSPEED_1080" \
+		-a "[fan:5]/GPUTargetFanSpeed=$FANSPEED_1080" \
+		-a "[fan:6]/GPUTargetFanSpeed=$FANSPEED_1080"
+fi
 
 #########################################################
 # POWER LIMITS ##########################################   
 
-sudo nvidia-smi -i 0 -pl $POWLIM_1070
-sudo nvidia-smi -i 1,2,3,4,5,6 -pl $POWLIM_1080
-
+if [ ! "$JUST_CORE" = "1" ] && [ ! "$JUST_MEM" = "1" ]; then
+	sudo nvidia-smi -i 0 -pl $POWLIM_1070
+	sudo nvidia-smi -i 1,2,3,4,5,6 -pl $POWLIM_1080
+fi
 
 #########################################################
 # OVERCLOCK #############################################
@@ -95,41 +146,43 @@ sudo nvidia-smi -i 1,2,3,4,5,6 -pl $POWLIM_1080
 #	-a "[gpu:5]/GPUOverVoltageOffset=$VOLTOFFSET_1080" \
 #	-a "[gpu:6]/GPUOverVoltageOffset=$VOLTOFFSET_1080" 
 
+if [ ! "$JUST_MEM" = "1" ]; then
+	nvidia-settings -V \
+		-a "[gpu:0]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1070"    \
+		-a "[gpu:1]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:2]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:3]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:4]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:5]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:6]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
+		\
+		-a "[gpu:0]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1070"    \
+		-a "[gpu:1]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:2]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:3]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:4]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:5]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
+		-a "[gpu:6]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"
+fi
 
-nvidia-settings -V \
-	-a "[gpu:0]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1070"    \
-	-a "[gpu:1]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:2]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:3]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:4]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:5]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:6]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-	\
-	-a "[gpu:0]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1070" \
-	-a "[gpu:1]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-	-a "[gpu:2]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-	-a "[gpu:3]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-	-a "[gpu:4]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-	-a "[gpu:5]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-	-a "[gpu:6]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080"
 
-
-nvidia-settings -V \
-	-a "[gpu:0]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1070"    \
-	-a "[gpu:1]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:2]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:3]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:4]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:5]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	-a "[gpu:6]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-	\
-	-a "[gpu:0]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1070" \
-	-a "[gpu:1]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-	-a "[gpu:2]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-	-a "[gpu:3]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-	-a "[gpu:4]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-	-a "[gpu:5]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-	-a "[gpu:6]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"
-
+if [ ! "$JUST_CORE" = "1" ]; then
+	nvidia-settings -V \
+		-a "[gpu:0]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1070" \
+		-a "[gpu:1]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:2]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:3]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:4]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:5]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:6]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		\
+		-a "[gpu:0]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1070" \
+		-a "[gpu:1]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
+		-a "[gpu:2]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
+		-a "[gpu:3]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
+		-a "[gpu:4]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
+		-a "[gpu:5]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
+		-a "[gpu:6]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"
+fi
 
 echo "done overclocking..."

@@ -51,7 +51,7 @@ fi
 usage()
 {
 cat << EOF
-usage: $0 COIN options
+usage: $0 options
 
 This script builds and mines the various targets
 

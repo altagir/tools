@@ -41,7 +41,7 @@ if [ "$PID" = "" ]; then
 else
 	UP=$(ps -o etime= -p $PID)
 	UP="$(echo -e "${UP}" | sed -e 's/^[[:space:]]*//')"	
-	DIFF=`expr substr ${UP} 1 5`
+	DIFF=${UP:(-5)}
 	if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
 		echo "miner started less than 2 mn ago, skipping check"
 		exit 0
