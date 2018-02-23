@@ -41,14 +41,18 @@ if [ "$PID" = "" ]; then
 else
 	UP=$(ps -o etime= -p $PID)
 	UP="$(echo -e "${UP}" | sed -e 's/^[[:space:]]*//')"	
-	DIFF=${UP:(-5)}
-	if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
-		echo "miner started less than 2 mn ago, skipping check"
-		exit 0
+	
+	if [ "${#UP}" -le 5 ]; then
+
+		DIFF=${UP:(-5)}
+		if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
+			echo "miner started less than 2 mn ago, skipping check"
+			exit 0
+		fi
 	fi
+	
 	#echo "Mining uptime: $UP"
 fi
-
 
 FAIL_COUNT=0
 GPU=0
