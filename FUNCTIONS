@@ -39,7 +39,7 @@ updateTime ()
 totalMiningTime ()
 {
 	END=$(date +%s);
-	echo $((END-LAST_COIN_STARTED)) | awk '{print int($1/60)":"int($1%60)}'
+	echo $((END-LAST_COIN_STARTED)) | awk '{print int($1/3600)"h "int(($1/60)%60)"m "int($1%60)"s"}'
 }
 
 saveCoin ()
