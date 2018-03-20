@@ -37,7 +37,7 @@ if [ "$XORG_NBINSTANCES" = "0" ] || [ "$XORG_NBINSTANCES" = "1" ]; then
 	echo "mining: Starting X servers"
 	X :0 &
 	# increase for slow HD
-	sleep 2
+	sleep 3
 	export DISPLAY=:0
 fi
 
@@ -66,12 +66,12 @@ OPTIONS:
 EOF
 }
 
-
 ################################################################################
 
 cd $MINER_PATH
 
 settings_load
+INITIAL_COIN=$LAST_COIN_MINED
 
 ################################################################################
 # Parse parameters
@@ -96,7 +96,7 @@ case $OPTION in
 		;;
 
 	l)
-		COIN_TO_MINE=$DEFAULT_COIN
+		COIN_TO_MINE=$LAST_COIN_MINED
 		;;
 
 	c)
@@ -121,17 +121,15 @@ if [ "$COIN_TO_MINE" = "" ]; then
 	read ans
 
 	if [ "$ans" = "" ]; then
-		COIN_TO_MINE=$DEFAULT_COIN
-		printf "$DEFAULT_COIN\n\n"
+		COIN_TO_MINE=$LAST_COIN_MINED
+		printf "$LAST_COIN_MINED\n\n"
 	else
 		COIN_TO_MINE=${!MINERS[$ans]:0:1}
 		echo ""
 	fi
 
-	DEFAULT_COIN=$COIN_TO_MINE
+	LAST_COIN_MINED=$COIN_TO_MINE
 fi
-
-settings_save
 
 
 if [ "$DEVICES" = "" ]; then
@@ -142,69 +140,11 @@ if [ "$DEVICES" = "" ]; then
 	done
 fi
 
-DEVICES_SPACES=${DEVICES//,/ }
-DEVICES_COUNT=$(echo $DEVICES_SPACES | wc -w)
 
 ####
 
+launch_miner $COIN_TO_MINE $DEVICES
 
-# Loop and print it.  Using offset and length to extract values
-COUNT=${#MINERS[@]}
-for ((i=0; i<$COUNT; i++))
-do
-	COIN=${!MINERS[i]:0:1}
-	if [ "$COIN" != "$COIN_TO_MINE" ]; then
-		continue
-	fi
+echo "${BOLD}Miner interrupted.${NC}"
+systemctl is-active --quiet mining && echo "{BOLD}Restarting daemon.${NC}" && sudo service mining restart
 
-	echo "-------------------------------------------------------------------------------"  
-	printf "Mining ${BOLD}$COIN${NB} with $DEVICES_COUNT devices ($DEVICES) on $HOSTNAME\n"
-	echo "-------------------------------------------------------------------------------"  
-	mail $EMAIL_NOTIF -s "$HOSTNAME : Mining $COIN ($DEVICES_COUNT GPUS)" <<< "Started mining $COIN with devices $DEVICES"
-	
-	MINER_DESC="${!MINERS[i]:1:1}"
-	MINER_TOUSE="${!MINERS[i]:2:1}"
-	MINER_PROTO="${!MINERS[i]:3:1}"
-	MINER_SERVER="${!MINERS[i]:4:1}"
-	MINER_PORT="${!MINERS[i]:5:1}"
-	MINER_USER="${!MINERS[i]:6:1}"
-	MINER_PASS="${!MINERS[i]:7:1}"
-
-
-
-	if [ "$MINER_TOUSE" = "ZM" ]; then
-
-		echo "$ZMMINER --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --dev $DEVICES_SPACES"
-		/bin/bash -ce "exec $ZMMINER --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --dev $DEVICES_SPACES"
-
-
-	elif [ "$MINER_TOUSE" = "EWFB" ]; then
-	
-		echo "$EWFBMINER --fee 0 --pec  --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --cuda_devices $DEVICES_SPACES"
-		/bin/bash -ce "exec $EWFBMINER --fee 0 --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --cuda_devices $DEVICES_SPACES"
-
-
-	elif [ "$MINER_TOUSE" = "CCMINER" ]; then
-
-		echo "$CCMINER -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES" 
-		/bin/bash -ce "exec $CCMINER -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
-
-
-	elif [ "$MINER_TOUSE" = "BFGMINER" ]; then
-
-		echo "$BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES" 
-		/bin/bash -ce "exec $BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
-	
-	else
-		echo "Unconfigured miner $MINER"
-		exit 1
-	fi
-
-	echo "${BOLD}Miner interrupted. restarting${NB}"
-	sudo service mining restart
-
-	exit 0 
-done
-
-echo "Could not handle $COIN_TO_MINE"
-exit 1

@@ -31,7 +31,7 @@ cd $MINER_PATH
 
 settings_load
 
-CURRENTLY_MINING=$DEFAULT_COIN
+CURRENTLY_MINING=$LAST_COIN_MINED
 printf "Currently mining : ${BOLD}$CURRENTLY_MINING${NC}\n"
 
 ################################################################################
@@ -49,24 +49,19 @@ if [ "$COIN_TO_MINE" = "" ]; then
 	read ans
 	
 	if [ "$ans" = "" ]; then
-		COIN_TO_MINE=$DEFAULT_COIN
-		printf "$DEFAULT_COIN\n\n"
+		COIN_TO_MINE=$LAST_COIN_MINED
+		printf "$LAST_COIN_MINED\n\n"
 	else
 		COIN_TO_MINE=${!MINERS[$ans]:0:1}
 		echo ""
 	fi
     
-    DEFAULT_COIN=$COIN_TO_MINE
+    LAST_COIN_MINED=$COIN_TO_MINE
 fi
 
 
-settings_save
 
-if [ "$COIN_TO_MINE" = "$CURRENTLY_MINING" ]; then
-	echo "Already mining $COIN_TO_MINE, restarting service"
-else
-	echo "Switching to $COIN_TO_MINE"
-fi
+saveCoin $COIN_TO_MINE
 
-sudo service mining restart
-
+systemctl is-active --quiet mining && sudo service mining restart && exit 0
+$SCRIPT_DIR/mine -l

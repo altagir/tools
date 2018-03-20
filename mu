@@ -16,10 +16,11 @@ source $SCRIPT_DIR/FUNCTIONS
 
 settings_load
 source /etc/mining.conf
+time=$(totalMiningTime)
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
-	printf "${BOLD}NO mining detected !!${NB}\n"
+	printf "${BOLD}NO mining detected !!${NC}\n"
 else
-	printf "Mining ${BOLD}$DEFAULT_COIN${NB}\tsince${BOLD}$(ps -o etime= -p $PID) ${NB}\n"
+	printf "Mining ${BOLD}$LAST_COIN_MINED${NC}\tlast run:${BOLD}$(ps -o etime= -p $PID)${NC}\tTotal: ${BOLD}$time${NC}\tRestart: ${BOLD}$LAST_COIN_NB${NC}\n"
 fi

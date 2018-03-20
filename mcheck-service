@@ -11,7 +11,6 @@ trap "rm -f ${LOCKFILE}; exit" INT TERM EXIT
 echo $$ > ${LOCKFILE}
 
 
-
 ################################################################################
 ### SCRIPT_DIR is the location the script
 SCRIPT_DIR="`dirname \"$0\"`"                 # relative
@@ -35,7 +34,7 @@ fi
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
-	echo "no mining detectedi, restarting system"
+	echo "no mining detected, restarting system"
 	systemctl restart mining
 	exit 0
 else
@@ -45,33 +44,58 @@ else
 	if [ "${#UP}" -le 5 ]; then
 
 		DIFF=${UP:(-5)}
-		if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "01:"* ]]; then
-			echo "miner started less than 2 mn ago, skipping check"
+		if [[ "$DIFF" = "00:"* ]] || [[ "$DIFF" = "02:"* ]]; then
+			echo "miner started less than 3 mn ago, skipping check"
 			exit 0
 		fi
 	fi
 	
-	#echo "Mining uptime: $UP"
+	echo "Mining uptime: $UP"
 fi
+
 
 FAIL_COUNT=0
 GPU=0
 
+if [[ "$NB_GPUS" = 0 ]]; then
+	MSG="No Cards detected, rebooting"
+	echo "$MSG"
+	state=$MSG$(tail -n 40 /var/log/mining.log 2> /dev/null)
+	mail "$EMAIL_NOTIF" -s "$HOSTNAME : $MSG" <<< $state
+	sudo reboot
+	exit 1	
+fi
+
 while [ "$GPU" -lt "$NB_GPUS" ]; do
 
-	GPUINFO=`nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
-
-	if [[ $GPUINFO = *"Unknown"* ]]; then
-		echo "Rebooting due to unknown GPU state $GPUINFO"
-		reboot
-       		exit 0
+	REBOOT=0
+	MSG=""
+	GPUINFO=`timeout 1.5s nvidia-smi -i $GPU --query-gpu=index,name,utilization.gpu,temperature.gpu --format=csv,noheader`
+	if [[ "$?" != "0" ]] ; then
+		REBOOT=1
+		MSG="system stalled, rebooting"
+	elif [[ $GPUINFO = *"Unknown"* ]]; then
+		REBOOT=1
+		MSG="Rebooting due to unknown GPU state $GPUINFO"
 	elif [[ $GPUINFO = *"ERR"* ]]; then
-		echo "Rebooting due to ERROR in GPU state $GPUINFO"
+		REBOOT=1
+		SG="Rebooting due to ERROR in GPU state $GPUINFO"
+	fi
+
+
+	if [ "$REBOOT" = "1" ]; then
+		echo "$MSG"
+		state=$MSG$(tail -n 40 /var/log/mining.log 2> /dev/null)
+		mail "$EMAIL_NOTIF" -s "$HOSTNAME : $MSG" <<< $state
 		reboot
-		exit 0
+		exit 1
 	fi
 
 	UTIL=$(echo $GPUINFO | cut -f3 -d"," | cut -f2 -d" ")
+	if [ "$UTIL" = "" ] ; then
+		echo "Issue checking "
+	fi
+
 	if (($UTIL < $IDLE_GPU)); then
 		let FAIL_COUNT=FAIL_COUNT+1 
 		echo "GPU$GPU IDLE $GPUINFO"
@@ -86,7 +110,7 @@ done
 # if 2 fail. restart
 if [ $FAIL_COUNT -ge 2 ]; then
 
-	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 20 /var/log/mining.log 2> /dev/null)$(nvidia-smi)
+	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 40 /var/log/mining.log 2> /dev/null)$(nvidia-smi)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE ($FAIL_COUNT/$NB_GPUS), restarting miner" <<< $state
 
 	### restart ccminer

@@ -27,15 +27,19 @@ if [ "$1" = "-nofancy" ]; then
 	NC=""
 fi
 
-CURRENTLY_MINING=$DEFAULT_COIN
+CURRENTLY_MINING=$LAST_COIN_MINED
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
-UPTIME=$(echo $(ps -o etime= -p $PID) | xargs)
 
+if [ "$PID" = "" ]; then
+	UPTIME="-1"
+else
+	UPTIME=$(echo $(ps -o etime= -p $PID) | xargs)
+fi
 
-printf "Nb GPUS          : ${BOLD}$NB_GPUS${NB}\n"
-printf "Currently mining : ${BOLD}$CURRENTLY_MINING${NB}\n"
-printf "Mining uptime    : ${BOLD}$UPTIME${NB}\n\n"
+printf "Currently mining : ${BOLD}$CURRENTLY_MINING${NC}\ton ${BOLD}$NB_GPUS${NC} GPUs\n"
+printf "Mining uptime    : ${BOLD}$UPTIME${NC}\n"
+printf "System uptime    :${BOLD}$(uptime)${NC}\n\n"
 
 
 printf "#\tStatut\tUsage\tTemp\t Power / Power limit\tFan\t Name\n"
