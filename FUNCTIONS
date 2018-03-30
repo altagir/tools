@@ -39,7 +39,8 @@ updateTime ()
 totalMiningTime ()
 {
 	END=$(date +%s);
-	echo $((END-LAST_COIN_STARTED)) | awk '{print int($1/3600)"h "int(($1/60)%60)"m "int($1%60)"s"}'
+	PERIOD=$((END-LAST_COIN_STARTED))
+	date -u -d @${PERIOD} +"%T"
 }
 
 saveCoin ()
@@ -51,7 +52,7 @@ saveCoin ()
 		echo "Switching to new coin: $NEW_COIN_TO_MINE"
 		LAST_COIN_MINED=$NEW_COIN_TO_MINE
 		LAST_COIN_STARTED=$(date +%s)
-		LAST_COIN_NB=1
+		LAST_COIN_NB=0
 	else
 		echo "Restarting coin: $NEW_COIN_TO_MINE"
 		LAST_COIN_NB=`expr $LAST_COIN_NB + 1`
@@ -131,7 +132,8 @@ launch_miner ()
 			printf "Mining ${BOLD}$COIN ${NC} with $DEVICES_COUNT devices ($DEVICES)\n"
 			echo "-------------------------------------------------------------------------------"
 			mail $EMAIL_NOTIF -s "$HOSTNAME : Mining $COIN ($DEVICES_COUNT GPUS)" <<< "Started mining $COIN with devices $DEVICES"
-	
+			echo "$CMD"
+echo "yoyoyo"	
 			if [ "$DAEMON" = "1" ]; then
 				/bin/bash -ce "exec $CMD  >> /var/log/mining.log &"
 			else

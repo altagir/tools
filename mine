@@ -145,6 +145,7 @@ fi
 
 launch_miner $COIN_TO_MINE $DEVICES
 
+
 echo "${BOLD}Miner interrupted.${NC}"
 systemctl is-active --quiet mining && echo "{BOLD}Restarting daemon.${NC}" && sudo service mining restart
 

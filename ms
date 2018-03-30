@@ -37,8 +37,7 @@ else
 	UPTIME=$(echo $(ps -o etime= -p $PID) | xargs)
 fi
 
-printf "Currently mining : ${BOLD}$CURRENTLY_MINING${NC}\ton ${BOLD}$NB_GPUS${NC} GPUs\n"
-printf "Mining uptime    : ${BOLD}$UPTIME${NC}\n"
+printf "$(mu)\n"
 printf "System uptime    :${BOLD}$(uptime)${NC}\n\n"
 
 

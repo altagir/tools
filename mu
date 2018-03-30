@@ -22,5 +22,5 @@ PID=$(ps -ef | awk '/[m]iner/{print $2}')
 if [ "$PID" = "" ]; then
 	printf "${BOLD}NO mining detected !!${NC}\n"
 else
-	printf "Mining ${BOLD}$LAST_COIN_MINED${NC}\tlast run:${BOLD}$(ps -o etime= -p $PID)${NC}\tTotal: ${BOLD}$time${NC}\tRestart: ${BOLD}$LAST_COIN_NB${NC}\n"
+	printf "Mining ${BOLD}$LAST_COIN_MINED${NC}\t${BOLD}$(ps -o etime= -p $PID)${NC}\ttotal: ${BOLD}$time${NC},\t(${BOLD}$LAST_COIN_NB${NC} restarts, ${BOLD}$NB_GPUS${NC} GPUs)\n"
 fi
