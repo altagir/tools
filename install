@@ -14,7 +14,7 @@ echo "installing packages"
 sudo apt-get install -f ssh zsh tree screen vim net-tools bmon ifupdown checksecurity logcheck at-spi2-core \
 	build-essential gcc-5 g++-5 cmake pkg-config libtool automake autoconf autogen \
 	jq curl git mailutils xterm ntpdate \
-	nvidia-cuda-dev nvidia-cuda-toolkit xorg xserver-xorg-legacy xserver-xorg-video-dummy libcurl4-openssl-dev libssl-dev libjansson-dev autotools-dev uthash-dev libevent-dev libncurses5-dev libncursesw5-dev libbase58-dev libblkmaker-0.1-dev libhidapi-dev libusb-1.0-0-dev libmicrohttpd-dev  libudev-dev libcurl4-openssl-dev libscrypt-dev yasm
+	nvidia-cuda-dev nvidia-cuda-toolkit xorg xserver-xorg-legacy xserver-xorg-video-dummy libcurl4-openssl-dev libssl-dev libjansson-dev autotools-dev uthash-dev libevent-dev libncurses5-dev libncursesw5-dev libbase58-dev libblkmaker-0.1-dev libhidapi-dev libusb-1.0-0-dev libmicrohttpd-dev  libudev-dev libscrypt-dev yasm
     
 
 ##############################################################################################

@@ -18,7 +18,7 @@ source $SCRIPT_DIR/FUNCTIONS
 usage()
 {
 cat << EOF
-usage: $0 COIN
+usage: $0 COIN [0|1:reboot] 
 
 This script change current money and restart
 EOF
@@ -43,6 +43,7 @@ if [ "$1" = "" ]; then
 	COIN_TO_MINE=$1
 fi
 
+
  
 if [ "$COIN_TO_MINE" = "" ]; then
 	display_coins
@@ -63,5 +64,11 @@ fi
 
 saveCoin $COIN_TO_MINE
 
+if [ "$2" = "1" ]; then
+	sudo reboot
+	exit 0
+fi
+
 systemctl is-active --quiet mining && sudo service mining restart && exit 0
 $SCRIPT_DIR/mine -l
+

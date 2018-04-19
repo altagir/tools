@@ -109,15 +109,35 @@ launch_miner ()
 			MINER_PASS="${!MINERS[i]:7:1}"
 			
 
-			if [ "$MINER_TOUSE" = "ZM" ]; then
+			if [ "$MINER_TOUSE" = "ZMMINER" ]; then
 				CMD="$ZMMINER --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --dev $DEVICES_SPACES"
+			
 			elif [ "$MINER_TOUSE" = "EWFB" ]; then
 				# --pec for stats
 				CMD="$EWFBMINER --fee 0 --server $MINER_SERVER --port $MINER_PORT --user $MINER_USER.$HOSTNAME --pass $MINER_PASS --cuda_devices $DEVICES_SPACES"
+			
 			elif [ "$MINER_TOUSE" = "CCMINER" ]; then
-				CMD="$CCMINER -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+				CMD="$CCMINER --retry-pause 1 -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
+			elif [ "$MINER_TOUSE" = "XEVAN_MINER" ]; then
+				CMD="$XEVAN_MINER --retry-pause 1 -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
+			elif [ "$MINER_TOUSE" = "CRYPTONIGHT_MINER" ]; then
+				CMD="$CRYPTONIGHT_MINER -a $MINER_PROTO -i $INTENSITY -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
 			elif [ "$MINER_TOUSE" = "BFGMINER" ]; then
 				CMD="$BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
+			elif [ "$MINER_TOUSE" = "BMINER" ]; then
+				CMD="$BMINER -nofee -no-timestamps -uri stratum://$MINER_USER.$HOSTNAME@$MINER_SERVER:$MINER_PORT -api 127.0.0.1:1880 -devices $DEVICES "
+				
+			elif [ "$MINER_TOUSE" = "X17_MINER" ]; then
+				CMD="$X17_MINER -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
+			elif [ "$MINER_TOUSE" = "X16_MINER" ]; then
+				CMD="$X16_MINER -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+		
+				
 			elif [ "$MINER_TOUSE" = "ETHMINER" ]; then
 				CMD="$ETHMINER -U -SP 1 -S $MINER_SERVER:$MINER_PORT -O $MINER_USER.$HOSTNAME --farm-recheck 1000 -v 2"
 			else
@@ -133,7 +153,7 @@ launch_miner ()
 			echo "-------------------------------------------------------------------------------"
 			mail $EMAIL_NOTIF -s "$HOSTNAME : Mining $COIN ($DEVICES_COUNT GPUS)" <<< "Started mining $COIN with devices $DEVICES"
 			echo "$CMD"
-echo "yoyoyo"	
+			
 			if [ "$DAEMON" = "1" ]; then
 				/bin/bash -ce "exec $CMD  >> /var/log/mining.log &"
 			else

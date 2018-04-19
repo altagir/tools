@@ -37,7 +37,7 @@ else
 	UPTIME=$(echo $(ps -o etime= -p $PID) | xargs)
 fi
 
-printf "$(mu)\n"
+printf "$($SCRIPT_DIR/mu)\n"
 printf "System uptime    :${BOLD}$(uptime)${NC}\n\n"
 
 

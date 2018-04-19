@@ -2,9 +2,11 @@
 
 echo "*** updating ***"
 cd ~ && updateRec
-cd /crypto && updateRec
+cd /crypto && updateSubdirs
 
 
+echo "miners:"
+cd /crypto/miners && updateSubdirs
 
 echo ""
 echo "*** checking status ***"

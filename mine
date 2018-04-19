@@ -6,6 +6,7 @@ export GPU_USE_SYNC_OBJECTS=1
 export GPU_MAX_ALLOC_PERCENT=100
 export GPU_SINGLE_ALLOC_PERCENT=100
 
+export NO_AT_BRIDGE="1"
 
 ################################################################################
 ### SCRIPT_DIR is the location the script
@@ -43,7 +44,7 @@ fi
 
 # if override or never enabled
 if [ "$OVERCLOCK" = "1" ] || [ "$PM_ENABLED" = "0" ]; then
-	$SCRIPT_DIR/overclock
+	(sleep 35 && $SCRIPT_DIR/overclock)&
 fi
 
 ################################################################################
@@ -146,6 +147,6 @@ fi
 launch_miner $COIN_TO_MINE $DEVICES
 
 
-echo "${BOLD}Miner interrupted.${NC}"
-systemctl is-active --quiet mining && echo "{BOLD}Restarting daemon.${NC}" && sudo service mining restart
+print "${BOLD}Miner interrupted.${NC}\n"
+systemctl is-active --quiet mining && print "${BOLD}Restarting daemon.${NC}\n" && sudo service mining restart
 

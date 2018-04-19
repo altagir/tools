@@ -18,7 +18,7 @@ settings_load
 source /etc/mining.conf
 time=$(totalMiningTime)
 
-PID=$(ps -ef | awk '/[m]iner/{print $2}')
+PID=$(ps -ef | awk '/[m]iner/{print $2}' | tail -n1 )
 if [ "$PID" = "" ]; then
 	printf "${BOLD}NO mining detected !!${NC}\n"
 else
