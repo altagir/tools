@@ -69,6 +69,8 @@ if [ "$2" = "1" ]; then
 	exit 0
 fi
 
+sudo reboot
+
 systemctl is-active --quiet mining && sudo service mining restart && exit 0
-$SCRIPT_DIR/mine -l
+#$SCRIPT_DIR/mine -l
 

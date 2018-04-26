@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "*** updating ***"
-cd ~ && updateRec
+cd ~ && updateSubdirs
 cd /crypto && updateSubdirs
 
 

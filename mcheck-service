@@ -115,7 +115,8 @@ if [ $FAIL_COUNT -ge 2 ]; then
 
 	### restart ccminer
 	echo "restarting mining, fail=$FAIL_COUNT"
-	systemctl restart mining
+	reboot
+#	systemctl restart mining
 fi
 
 rm -f ${LOCKFILE}

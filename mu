@@ -20,7 +20,7 @@ time=$(totalMiningTime)
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}' | tail -n1 )
 if [ "$PID" = "" ]; then
-	printf "${BOLD}NO mining detected !!${NC}\n"
+	printf "${BOLD}NO mining detected !!${NC} last: ${BOLD}$LAST_COIN_MINED${NC}\n"
 else
 	printf "Mining ${BOLD}$LAST_COIN_MINED${NC}\t${BOLD}$(ps -o etime= -p $PID)${NC}\ttotal: ${BOLD}$time${NC},\t(${BOLD}$LAST_COIN_NB${NC} restarts, ${BOLD}$NB_GPUS${NC} GPUs)\n"
 fi
