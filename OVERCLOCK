@@ -52,12 +52,13 @@ EOF
 
 setPowerLimits()
 {
-	echo "setting power limits"  "$POWLIM_10802"
-	sudo nvidia-smi -i 0 -pl		"$POWLIM_10802"
-	sudo nvidia-smi -i 1 -pl		"$POWLIM_10803"
+	echo "Setting Power limits"
+
+	sudo nvidia-smi -i 0 -pl		"$POWLIM_1080_2"
+	sudo nvidia-smi -i 1 -pl		"$POWLIM_1080_3"
 	sudo nvidia-smi -i 2 -pl		"$POWLIM_1080ti"
 	sudo nvidia-smi -i 3 -pl		"$POWLIM_1070"
-	sudo nvidia-smi -i 4,5,6,7,8,9 -pl	"$POWLIM_1080"
+	sudo nvidia-smi -i 4,5,6,7,8,9 -pl	"$POWLIM_1080_1"
 }
 
 
@@ -65,6 +66,8 @@ setPowerLimits()
 
 setFans()
 {
+	echo "Setting Fan speed"
+
 	nvidia-settings -V \
 		-a "[gpu:0]/GPUFanControlState=1" \
 		-a "[gpu:1]/GPUFanControlState=1" \
@@ -78,16 +81,16 @@ setFans()
 		-a "[gpu:9]/GPUFanControlState=1"
 
 	nvidia-settings -V \
-		-a "[fan:0]/GPUTargetFanSpeed=$FANSPEED_10802" \
-		-a "[fan:1]/GPUTargetFanSpeed=$FANSPEED_10802" \
+		-a "[fan:0]/GPUTargetFanSpeed=$FANSPEED_1080_2" \
+		-a "[fan:1]/GPUTargetFanSpeed=$FANSPEED_1080_3" \
 		-a "[fan:2]/GPUTargetFanSpeed=$FANSPEED_1080ti" \
 		-a "[fan:3]/GPUTargetFanSpeed=$FANSPEED_1070" \
-		-a "[fan:4]/GPUTargetFanSpeed=$FANSPEED_1080" \
-		-a "[fan:5]/GPUTargetFanSpeed=$FANSPEED_1080" \
-		-a "[fan:6]/GPUTargetFanSpeed=$FANSPEED_1080" \
-		-a "[fan:7]/GPUTargetFanSpeed=$FANSPEED_1080" \
-		-a "[fan:8]/GPUTargetFanSpeed=$FANSPEED_1080" \
-		-a "[fan:9]/GPUTargetFanSpeed=$FANSPEED_1080"
+		-a "[fan:4]/GPUTargetFanSpeed=$FANSPEED_1080_1" \
+		-a "[fan:5]/GPUTargetFanSpeed=$FANSPEED_1080_1" \
+		-a "[fan:6]/GPUTargetFanSpeed=$FANSPEED_1080_1" \
+		-a "[fan:7]/GPUTargetFanSpeed=$FANSPEED_1080_1" \
+		-a "[fan:8]/GPUTargetFanSpeed=$FANSPEED_1080_1" \
+		-a "[fan:9]/GPUTargetFanSpeed=$FANSPEED_1080_1"
 
 }
 
@@ -96,56 +99,60 @@ setFans()
 
 overclockCore()
 {
+	echo "Overclocking Core Voltage"
+
 	nvidia-settings -V \
-		-a "[gpu:0]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_10802"    \
-		-a "[gpu:1]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_10802"    \
+		-a "[gpu:0]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_2"    \
+		-a "[gpu:1]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_3"    \
 		-a "[gpu:2]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080ti"    \
 		-a "[gpu:3]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1070"    \
-		-a "[gpu:4]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:5]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:6]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:7]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:8]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:9]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080"  \
+		-a "[gpu:4]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:5]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:6]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:7]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:8]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:9]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_1"  \
 		\
-		-a "[gpu:0]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_10802"    \
-		-a "[gpu:1]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_10802"    \
+		-a "[gpu:0]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_2"    \
+		-a "[gpu:1]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_3"    \
 		-a "[gpu:2]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080ti"    \
 		-a "[gpu:3]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1070"    \
-		-a "[gpu:4]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:5]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"    \
-		-a "[gpu:6]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"		\
-		-a "[gpu:7]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"		\
-		-a "[gpu:8]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"		\
-		-a "[gpu:9]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080"
+		-a "[gpu:4]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:5]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"    \
+		-a "[gpu:6]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"		\
+		-a "[gpu:7]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"		\
+		-a "[gpu:8]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"		\
+		-a "[gpu:9]/GPUGraphicsClockOffset[3]=$CLOCKOFFSET_1080_1"
 }
 
 ################################################################################
 
 overclockMem()
 {
+	echo "Overclocking Memory"
+
 	nvidia-settings -V \
-		-a "[gpu:0]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_10802" \
-		-a "[gpu:1]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_10802" \
+		-a "[gpu:0]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_2" \
+		-a "[gpu:1]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_3" \
 		-a "[gpu:2]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080ti" \
 		-a "[gpu:3]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1070" \
-		-a "[gpu:4]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-		-a "[gpu:5]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-		-a "[gpu:6]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-		-a "[gpu:7]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-		-a "[gpu:8]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
-		-a "[gpu:9]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080" \
+		-a "[gpu:4]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
+		-a "[gpu:5]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
+		-a "[gpu:6]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
+		-a "[gpu:7]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
+		-a "[gpu:8]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
+		-a "[gpu:9]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_1" \
 		\
-		-a "[gpu:0]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_10802" \
-		-a "[gpu:1]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_10802" \
+		-a "[gpu:0]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_2" \
+		-a "[gpu:1]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_3" \
 		-a "[gpu:2]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080ti" \
 		-a "[gpu:3]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1070" \
-		-a "[gpu:4]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-		-a "[gpu:5]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080" \
-		-a "[gpu:6]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"	\
-		-a "[gpu:7]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"	\
-		-a "[gpu:8]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"	\
-		-a "[gpu:9]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080"
+		-a "[gpu:4]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1" \
+		-a "[gpu:5]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1" \
+		-a "[gpu:6]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1"	\
+		-a "[gpu:7]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1"	\
+		-a "[gpu:8]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1"	\
+		-a "[gpu:9]/GPUMemoryTransferRateOffset[3]=$MEMOFFSET_1080_1"
 }
 
 ################################################################################
@@ -200,7 +207,6 @@ fi
 #########################################################
 # POWER LIMITS ##########################################   
 if [ "$APPLY_POWER_LIMIT" = "1" ]; then
-	echo "Setting Power limit"
 	setPowerLimits
 fi
 
@@ -208,7 +214,6 @@ fi
 #########################################################
 # FANS ##################################################   
 if [ "$APPLY_FAN" = "1" ]; then
-	echo "Setting Fan speed"
 	setFans
 fi
 
@@ -227,13 +232,11 @@ fi
 #	-a "[gpu:6]/GPUOverVoltageOffset=$VOLTOFFSET_1080" 
 
 if [ "$APPLY_CORE" = "1" ]; then
-	echo "Overclocking Core voltage"
 	overclockCore
 fi
 
 
 if [ "$APPLY_MEM" = "1" ]; then
-	echo "Overclocking memory"
 	overclockMem
 fi
 

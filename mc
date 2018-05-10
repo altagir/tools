@@ -47,13 +47,15 @@ fi
  
 if [ "$COIN_TO_MINE" = "" ]; then
 	display_coins
-	read ans
+	#read ans
 	
 	if [ "$ans" = "" ]; then
-		COIN_TO_MINE=$LAST_COIN_MINED
-		printf "$LAST_COIN_MINED\n\n"
+		exit 0
+		#COIN_TO_MINE=$LAST_COIN_MINED
+		#printf "$LAST_COIN_MINED\n\n"
 	else
-		COIN_TO_MINE=${!MINERS[$ans]:0:1}
+		COIN_TO_MINE=$ans	
+		#COIN_TO_MINE=${!MINERS[$ans]:0:1}
 		echo ""
 	fi
     
@@ -69,8 +71,8 @@ if [ "$2" = "1" ]; then
 	exit 0
 fi
 
-sudo reboot
+#sudo reboot 
 
 systemctl is-active --quiet mining && sudo service mining restart && exit 0
-#$SCRIPT_DIR/mine -l
+$SCRIPT_DIR/mine -l
 

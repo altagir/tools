@@ -15,6 +15,7 @@ settings_load () {
 		LAST_COIN_STARTED=$(grep LAST_COIN_STARTED $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 		LAST_COIN_NB=$(grep LAST_COIN_NB $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 		RESTART_IF_IDLE=$(grep RESTART_IF_IDLE $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
+		REBOOT_IF_IDLE=$(grep REBOOT_IF_IDLE $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 	fi
 }
 
@@ -29,6 +30,7 @@ settings_save () {
 		RESTART_IF_IDLE=1
 	fi
 	echo "RESTART_IF_IDLE=$RESTART_IF_IDLE" >> "$MINER_PATH/.mineDefaultCoin"
+	echo "REBOOT_IF_IDLE=$REBOOT_IF_IDLE" >> "$MINER_PATH/.mineDefaultCoin"
 }
 
 updateTime ()
@@ -50,6 +52,8 @@ saveCoin ()
 
 	if [ "$NEW_COIN_TO_MINE" != "$LAST" ]; then
 		echo "Switching to new coin: $NEW_COIN_TO_MINE"
+		time=$(totalMiningTime)
+		echo "$LAST    $LAST_COIN_STARTED    $time" >> /var/log/mined.log
 		LAST_COIN_MINED=$NEW_COIN_TO_MINE
 		LAST_COIN_STARTED=$(date +%s)
 		LAST_COIN_NB=0
@@ -92,6 +96,7 @@ launch_miner ()
 	DEVICES_SPACES=${DEVICES//,/ }
 	DEVICES_COUNT=$(echo $DEVICES_SPACES | wc -w)
 	COUNT=${#MINERS[@]}
+
 
 	for ((i=0; i<$COUNT; i++))
 	do
@@ -166,8 +171,19 @@ launch_miner ()
 
 ################################################################################
 
+
+HEIGHT=30
+WIDTH=50
+CHOICE_HEIGHT=30
+BACKTITLE="Backtitle here"
+TITLE="Mine coin"
+
+COINS_CHOICES=()
+
+
 display_coins () {
 	echo "Coins available :"
+	MENU="Last coin:  $LAST_COIN_MINED"
 
 	for ((i=0; i<$MINERS_COUNT; i++))
  	do
@@ -179,15 +195,31 @@ display_coins () {
 		DESCRIPTION="${!MINERS[i]:1:1}"
 		MINER_PROTO="${!MINERS[i]:3:1}"
 		
-		printf "${BOLD}%s${NC}\t%s%s" $i 
-		printf '%-20s' $COINNAME
+		
+		COINS_CHOICES+=($COINNAME)
 
-		printf '%-30s' "$DESCRIPTION"
-		printf '%-20s' "$MINER_PROTO"
+		DESC=$(echo $DESCRIPTION | tr -d ' ')
+		COINS_CHOICES+=($DESC)
 
-		echo ""
+#		printf "${BOLD}%s${NC}\t%s%s" $i 
+#		printf '%-20s' $COINNAME
+
+#		printf '%-30s' "$DESCRIPTION"
+#		printf '%-20s' "$MINER_PROTO"
+
+#		echo ""
 	done
-   
-	printf "\nFor which coin ? [${BOLD}$LAST_COIN_MINED${NC}] : "
+
+
+#	printf "\nFor which coin ? [${BOLD}$LAST_COIN_MINED${NC}] : "
+	ans=$(dialog --clear \
+                --backtitle "$BACKTITLE" \
+                --title "$TITLE" \
+                --menu "$MENU" \
+                $HEIGHT $WIDTH $CHOICE_HEIGHT \
+                "${COINS_CHOICES[@]}" \
+                2>&1 >/dev/tty)
+
+	echo $CHOICE
 }
 

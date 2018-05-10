@@ -119,13 +119,15 @@ done
 if [ "$COIN_TO_MINE" = "" ]; then
 
 	display_coins
-	read ans
+	#read ans
 
 	if [ "$ans" = "" ]; then
-		COIN_TO_MINE=$LAST_COIN_MINED
-		printf "$LAST_COIN_MINED\n\n"
+		exit 0
+		#COIN_TO_MINE=$LAST_COIN_MINED
+		#printf "$LAST_COIN_MINED\n\n"
 	else
-		COIN_TO_MINE=${!MINERS[$ans]:0:1}
+		COIN_TO_MINE=$ans 
+		#${!MINERS[$ans]:0:1}
 		echo ""
 	fi
 
@@ -148,6 +150,8 @@ launch_miner $COIN_TO_MINE $DEVICES
 
 
 printf "${BOLD}Miner interrupted.${NC}\n"
-systemctl is-active --quiet mining && printf "${BOLD}Restarting daemon.${NC}\n" && sudo reboot
+systemctl is-active --quiet mining && printf "${BOLD}Restarting daemon.${NC}\n" && sudo service mining restart
+
+# && sudo reboot
 # sudo service mining restart
 

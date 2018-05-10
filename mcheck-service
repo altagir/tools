@@ -27,9 +27,19 @@ fi
 source $SCRIPT_DIR/FUNCTIONS
 
 settings_load
+
 if [ "$RESTART_IF_IDLE" = "0" ]; then
 	exit 0
 fi
+
+
+reboot_check () 
+{
+	sudo reboot
+#	if [ "$REBOOT_IF_IDLE" = "1" ]; then
+#	fi
+}
+
 
 
 PID=$(ps -ef | awk '/[m]iner/{print $2}')
@@ -62,7 +72,7 @@ if [[ "$NB_GPUS" = 0 ]]; then
 	echo "$MSG"
 	state=$MSG$(tail -n 40 /var/log/mining.log 2> /dev/null)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : $MSG" <<< $state
-	sudo reboot
+	reboot_check
 	exit 1	
 fi
 
@@ -79,7 +89,7 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 		MSG="Rebooting due to unknown GPU state $GPUINFO"
 	elif [[ $GPUINFO = *"ERR"* ]]; then
 		REBOOT=1
-		SG="Rebooting due to ERROR in GPU state $GPUINFO"
+		MSG="Rebooting due to ERROR in GPU state $GPUINFO"
 	fi
 
 
@@ -87,7 +97,7 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 		echo "$MSG"
 		state=$MSG$(tail -n 40 /var/log/mining.log 2> /dev/null)
 		mail "$EMAIL_NOTIF" -s "$HOSTNAME : $MSG" <<< $state
-		reboot
+		reboot_check
 		exit 1
 	fi
 
@@ -115,7 +125,7 @@ if [ $FAIL_COUNT -ge 2 ]; then
 
 	### restart ccminer
 	echo "restarting mining, fail=$FAIL_COUNT"
-	reboot
+	reboot_check
 #	systemctl restart mining
 fi
 
