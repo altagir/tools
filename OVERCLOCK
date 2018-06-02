@@ -2,7 +2,6 @@
 
 ################################################################################################
 
-echo "overclocking..."
 
 # you must run this (done through install) for overclocking to run, separate screens is optional
 #nvidia-xconfig --allow-empty-initial-configuration --enable-all-gpus --cool-bits=28 --separate-x-screens
@@ -41,18 +40,24 @@ This script builds and mines the various targets
 OPTIONS:
    -m      apply memory OC
    -c      apply core OC
-   -f		  apply fans
-   -p		  power limits
-   -a		  all
-   -v      Verbose
+   -f      apply fans
+   -p      power limits
+   -a      all
+   -v      verbose
 EOF
 }
+
+
+################################################################################
+
+i=0
+n=0
 
 ################################################################################
 
 setPowerLimits()
 {
-	echo "Setting Power limits"
+	echo "Setting Power limits   ($i/$n)"
 
 	sudo nvidia-smi -i 0 -pl		"$POWLIM_1080_2"
 	sudo nvidia-smi -i 1 -pl		"$POWLIM_1080_3"
@@ -66,7 +71,8 @@ setPowerLimits()
 
 setFans()
 {
-	echo "Setting Fan speed"
+        i=$((i+1))
+	echo "Setting Fan speed   ($i/$n)"
 
 	nvidia-settings -V \
 		-a "[gpu:0]/GPUFanControlState=1" \
@@ -99,7 +105,8 @@ setFans()
 
 overclockCore()
 {
-	echo "Overclocking Core Voltage"
+        i=$((i+1))
+	echo "Overclocking Core Voltage    ($i/$n)"
 
 	nvidia-settings -V \
 		-a "[gpu:0]/GPUGraphicsClockOffset[2]=$CLOCKOFFSET_1080_2"    \
@@ -129,7 +136,8 @@ overclockCore()
 
 overclockMem()
 {
-	echo "Overclocking Memory"
+        i=$((i+1))
+	echo "Overclocking Memory    ($i/$n)"
 
 	nvidia-settings -V \
 		-a "[gpu:0]/GPUMemoryTransferRateOffset[2]=$MEMOFFSET_1080_2" \
@@ -163,6 +171,7 @@ if [ "$1" = "" ]; then
 		APPLY_MEM=1
 		APPLY_FAN=1
 		APPLY_POWER_LIMIT=1
+		n=4
 else	
 	while getopts “hmcfpa” OPTION
 	do
@@ -172,16 +181,20 @@ else
 			exit 0
 			;;
 		c)
+			n=$((n+1))
 			APPLY_CORE=1
 			;;
 
 		m)
+			n=$((n+1))
 			APPLY_MEM=1
 			;;
 		f)
+			n=$((n+1))
 			APPLY_FAN=1
 			;;
 		p)
+			n=$((n+1))
 			APPLY_POWER_LIMIT=1
 			;;
 		a)
@@ -189,6 +202,7 @@ else
 			APPLY_MEM=1
 			APPLY_FAN=1
 			APPLY_POWER_LIMIT=1
+			n=4
 			;;
 
 		?)

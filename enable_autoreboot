@@ -1,0 +1,36 @@
+#!/bin/bash
+
+################################################################################
+### SCRIPT_DIR is the location the script
+SCRIPT_DIR="`dirname \"$0\"`"                 # relative
+SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
+if [ -z "$SCRIPT_DIR" ] ; then
+    # error; for some reason, the path is not accessible
+    # to the script (e.g. permissions re-evaled after suid)
+    exit 1  # fail
+fi
+
+source $SCRIPT_DIR/FUNCTIONS
+
+
+################################################################################
+
+settings_load
+
+
+if [ "$1" = "1" ]; then
+	REBOOT_IF_IDLE="1"
+	echo "reboot daemon if idle ENABLED"
+elif [ "$1" = "0" ]; then
+	REBOOT_IF_IDLE="0"
+	echo "reboot if idle DISABLED"
+else
+	echo "usage: enable_autoreboot [0/1]"
+	echo "Current status : $REBOOT_IF_IDLE"
+	exit 1
+fi
+
+
+settings_save
+
+

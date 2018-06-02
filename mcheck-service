@@ -109,8 +109,9 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 	if (($UTIL < $IDLE_GPU)); then
 		let FAIL_COUNT=FAIL_COUNT+1 
 		echo "GPU$GPU IDLE $GPUINFO"
-	#else
-	#	echo "GPU$GPU OK"
+	else
+		FAIL_COUNT=0
+#		echo "GPU$GPU OK"
 	fi
 
 	let GPU=GPU+1 
@@ -118,14 +119,14 @@ while [ "$GPU" -lt "$NB_GPUS" ]; do
 done
 
 # if 2 fail. restart
-if [ $FAIL_COUNT -ge 2 ]; then
+if [ $FAIL_COUNT -ge 3 ]; then
 
 	state=$($SCRIPT_DIR/ms -nofancy)$(tail -n 40 /var/log/mining.log 2> /dev/null)$(nvidia-smi)
 	mail "$EMAIL_NOTIF" -s "$HOSTNAME : ISSUE ($FAIL_COUNT/$NB_GPUS), restarting miner" <<< $state
 
 	### restart ccminer
 	echo "restarting mining, fail=$FAIL_COUNT"
-	reboot_check
+	#reboot_check
 #	systemctl restart mining
 fi
 

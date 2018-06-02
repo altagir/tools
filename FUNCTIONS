@@ -12,6 +12,7 @@ settings_load () {
 	else
 # 		echo "loading settings file for mine.sh"
 		LAST_COIN_MINED=$(grep LAST_COIN_MINED $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
+		LAST_ALGO_MINED=$(grep LAST_ALGO_MINED $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 		LAST_COIN_STARTED=$(grep LAST_COIN_STARTED $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 		LAST_COIN_NB=$(grep LAST_COIN_NB $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
 		RESTART_IF_IDLE=$(grep RESTART_IF_IDLE $MINER_PATH/.mineDefaultCoin | sed -e 's#.*=\(\)#\1#')
@@ -23,6 +24,7 @@ settings_save () {
 	rm -f "$MINER_PATH/.mineDefaultCoin"
 		
 	echo "LAST_COIN_MINED=$LAST_COIN_MINED" >> "$MINER_PATH/.mineDefaultCoin"
+	echo "LAST_ALGO_MINED=$LAST_ALGO_MINED" >> "$MINER_PATH/.mineDefaultCoin"
 	echo "LAST_COIN_STARTED=$LAST_COIN_STARTED" >> "$MINER_PATH/.mineDefaultCoin"
 	echo "LAST_COIN_NB=$LAST_COIN_NB" >> "$MINER_PATH/.mineDefaultCoin"
 	
@@ -75,6 +77,16 @@ function devices_with_coma {
                 DEVICES="$DEVICES,$i"
         done
 	echo $DEVICES
+}
+
+################################################################################
+
+checkDialogIsInstalled ()
+{
+	INSTALLED=$(dialog -v)
+	if [ "$?" != "0" ]; then
+		sudo apt-get install dialog
+	fi
 }
 
 ################################################################################
@@ -134,10 +146,13 @@ launch_miner ()
 				CMD="$BFGMINER -a $MINER_PROTO -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
 			
 			elif [ "$MINER_TOUSE" = "BMINER" ]; then
-				CMD="$BMINER -nofee -no-timestamps -uri stratum://$MINER_USER.$HOSTNAME@$MINER_SERVER:$MINER_PORT -api 127.0.0.1:1880 -devices $DEVICES "
+				CMD="$BMINER -nofee -no-timestamps -uri stratum://$MINER_USER.$HOSTNAME:$MINER_PASS@$MINER_SERVER:$MINER_PORT -api 127.0.0.1:1880  -devices $DEVICES "
 				
 			elif [ "$MINER_TOUSE" = "X17_MINER" ]; then
 				CMD="$X17_MINER -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
+			
+			elif [ "$MINER_TOUSE" = "OPTIMINER" ]; then
+				CMD="$OPTIMINER --nodevfee -s $MINER_SERVER:$MINER_PORT -a $MINER_PROTO -u  $MINER_USER.$HOSTNAME -p $MINER_PASS -devices $DEVICES "
 			
 			elif [ "$MINER_TOUSE" = "X16_MINER" ]; then
 				CMD="$X16_MINER -o stratum+tcp://$MINER_SERVER:$MINER_PORT -u $MINER_USER.$HOSTNAME -p $MINER_PASS -d $DEVICES"
@@ -211,6 +226,8 @@ display_coins () {
 	done
 
 
+	checkDialogIsInstalled
+
 #	printf "\nFor which coin ? [${BOLD}$LAST_COIN_MINED${NC}] : "
 	ans=$(dialog --clear \
                 --backtitle "$BACKTITLE" \
@@ -220,6 +237,7 @@ display_coins () {
                 "${COINS_CHOICES[@]}" \
                 2>&1 >/dev/tty)
 
+	reset
 	echo $CHOICE
 }
 

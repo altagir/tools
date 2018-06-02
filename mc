@@ -13,6 +13,7 @@ fi
 source $SCRIPT_DIR/FUNCTIONS
 
 
+
 ################################################################################
 
 usage()
@@ -62,17 +63,41 @@ if [ "$COIN_TO_MINE" = "" ]; then
     LAST_COIN_MINED=$COIN_TO_MINE
 fi
 
-
+VOID=$(sudo ls)
 
 saveCoin $COIN_TO_MINE
 
-if [ "$2" = "1" ]; then
+if [ "$1" = "-r" ] || [ "$2" = "-r" ]; then
 	sudo reboot
 	exit 0
 fi
 
-#sudo reboot 
 
-systemctl is-active --quiet mining && sudo service mining restart && exit 0
+# remove overclock
+
+overclockLow() {
+	if [ "$(readlink $SCRIPT_DIR/overclock)" = "overclockHigh" ]; then
+		echo "UNDERCLOCKING"
+		cd $SCRIPT_DIR; rm overclock; ln -s overclockLow overclock; overclock -m > /dev/null
+	fi
+}
+
+overclockHigh() {
+	if [ "$(readlink $SCRIPT_DIR/overclock)" != "overclockHigh" ]; then
+		echo "..."
+		cd $SCRIPT_DIR; rm overclock; ln -s overclockHigh overclock && sleep 15 && echo "OVERCLOCKING" && overclock -m > /dev/null
+	fi
+}
+
+
+
+overclockLow
+
+systemctl is-active --quiet mining && echo "restarting mining service..." && sudo service mining restart && overclockHigh; exit 0
+
+echo "starting mining standalone..."
 $SCRIPT_DIR/mine -l
+
+overclockHigh
+
 
