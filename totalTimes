@@ -10,40 +10,16 @@ if [ -z "$SCRIPT_DIR" ] ; then
         exit 1  # fail
 fi
 
-source $SCRIPT_DIR/FUNCTIONS
 
 ################################################################################
 
-if [ "$1" = "" ]; then
-	echo "usage: totalMiningTime SYMBOL"
-	exit 1
-fi
+LIST=$(cat /var/log/mined.log | cut -d ' ' -f1 | sort | uniq)
 
-
-LIST=$(cat /var/log/mined.log | grep $1 | awk '{print $NF}')
-
-EPOCH='jan 1 1970'
-sum=0
 
 for i in $LIST
 do
-  sum="$(date -u -d "$EPOCH $i" +%s) + $sum"
+	$SCRIPT_DIR/totalTime $i  
 done
 
 
-
-settings_load
-source /etc/mining.conf
-
-if [ "$1" = "$LAST_COIN_MINED" ]; then
-	# add current uptime if coin is being mined
-	time=$(totalMiningTime)
-	sum="$(date -u -d "$EPOCH $time" +%s) + $sum"
-fi
-
-
-total=$(echo $sum|bc)
-calc(){ awk "BEGIN { print $* }"; }
-
-echo "$1" $(calc $total / 3600) "h"
 
