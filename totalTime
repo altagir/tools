@@ -15,6 +15,7 @@ source $SCRIPT_DIR/FUNCTIONS
 ################################################################################
 
 if [ "$1" = "" ]; then
+	echo "usage: totalMiningTime SYMBOL"
 	exit 1
 fi
 
@@ -34,15 +35,15 @@ done
 settings_load
 source /etc/mining.conf
 
-if [ "%1" = "$LAST_COIN_MINED" ]; then
+if [ "$1" = "$LAST_COIN_MINED" ]; then
 	# add current uptime if coin is being mined
 	time=$(totalMiningTime)
 	sum="$(date -u -d "$EPOCH $time" +%s) + $sum"
 fi
 
-total=$(echo $sum|bc)
 
+total=$(echo $sum|bc)
 calc(){ awk "BEGIN { print $* }"; }
 
-echo $(calc $total / 3600)
+echo "Hours: " $(calc $total / 3600)
 
