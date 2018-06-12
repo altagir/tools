@@ -55,7 +55,8 @@ saveCoin ()
 	if [ "$NEW_COIN_TO_MINE" != "$LAST" ]; then
 		echo "Switching to new coin: $NEW_COIN_TO_MINE"
 		time=$(totalMiningTime)
-		echo "$LAST    $LAST_COIN_STARTED    $time" >> /var/log/mined.log
+        	timeStarted=$(date -d @${LAST_COIN_STARTED} +"%d/%m %T")
+		echo "$LAST    $timeStarted	$time" >> /var/log/mined.log
 		LAST_COIN_MINED=$NEW_COIN_TO_MINE
 		LAST_COIN_STARTED=$(date +%s)
 		LAST_COIN_NB=0

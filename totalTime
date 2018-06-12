@@ -1,0 +1,48 @@
+#!/bin/bash
+
+################################################################################
+### SCRIPT_DIR is the location the script
+SCRIPT_DIR="`dirname \"$0\"`"                 # relative
+SCRIPT_DIR="`( cd \"$SCRIPT_DIR\" && pwd )`"  # absolutized and normalized
+if [ -z "$SCRIPT_DIR" ] ; then
+        # error; for some reason, the path is not accessible
+        # to the script (e.g. permissions re-evaled after suid)
+        exit 1  # fail
+fi
+
+source $SCRIPT_DIR/FUNCTIONS
+
+################################################################################
+
+if [ "$1" = "" ]; then
+	exit 1
+fi
+
+
+LIST=$(cat /var/log/mined.log | grep $1 | awk '{print $NF}')
+
+EPOCH='jan 1 1970'
+sum=0
+
+for i in $LIST
+do
+  sum="$(date -u -d "$EPOCH $i" +%s) + $sum"
+done
+
+
+
+settings_load
+source /etc/mining.conf
+
+if [ "%1" = "$LAST_COIN_MINED" ]; then
+	# add current uptime if coin is being mined
+	time=$(totalMiningTime)
+	sum="$(date -u -d "$EPOCH $time" +%s) + $sum"
+fi
+
+total=$(echo $sum|bc)
+
+calc(){ awk "BEGIN { print $* }"; }
+
+echo $(calc $total / 3600)
+
